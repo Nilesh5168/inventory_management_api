@@ -43,8 +43,9 @@ Example:
 
 ## 🧪 Sample API Requests
 
-### 🔹 Add a Product (`POST /products/`)
-```json
+🔹 Add a Product (`POST /products/`)
+
+Body-
 {
   "name": "Notebook",
   "description": "200 pages",
@@ -58,6 +59,8 @@ Example:
 🔹 Get Product by ID (GET /products/1)
 
 🔹 Update Product (PUT /products/1)
+
+Body-
 {
   "name": "Notebook",
   "description": "Updated 250 pages",
@@ -68,6 +71,8 @@ Example:
 🔹 Delete Product (DELETE /products/1)
 
 🔹 Add Stock Transaction (POST /stock/)
+
+Body-
 {
   "product_id": 1,
   "quantity": 20,
@@ -75,7 +80,10 @@ Example:
 }
 transaction_type must be either "IN" or "OUT"
 
+
+
 ## ✅ Postman Testing Guide — Inventory API
+
 📌 Base URL:
 http://127.0.0.1:8000
 
@@ -145,12 +153,12 @@ Allowed transaction_type values:
 
 "OUT" — to remove stock
 
-✅ Notes
+## ✅ Notes
 
 Ensure your PostgreSQL user has CREATE privileges on the public schema.
 
 Alembic revision files are committed in /alembic/versions/.
 
-📧 Contact
+## 📧 Contact
 Developer: Nilesh Patil
 Email: nileshpatil5168@gmail.com
