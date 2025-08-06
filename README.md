@@ -88,8 +88,11 @@ transaction_type must be either "IN" or "OUT"
 http://127.0.0.1:8000
 
 1. Add a Product
+
 Method: POST
+
 URL: /products/
+
 Body (raw, JSON):
 {
   "name": "Notebook",
@@ -99,6 +102,7 @@ Body (raw, JSON):
 }
 
 2. Get All Products
+
 Method: GET
 
 URL: /products/
@@ -106,6 +110,7 @@ URL: /products/
 Body: None
 
 3. Get Product by ID
+
 Method: GET
 
 URL: /products/1
@@ -113,6 +118,7 @@ URL: /products/1
 Replace 1 with the actual product ID
 
 4. Update a Product
+
 Method: PUT
 
 URL: /products/1
@@ -127,6 +133,7 @@ Body (raw, JSON):
 }
 
 5. Delete a Product
+
 Method: DELETE
 
 URL: /products/1
@@ -136,6 +143,7 @@ Replace 1 with the product ID
 Body: None
 
 6. Add a Stock Transaction
+
 Method: POST
 
 URL: /stock/
@@ -147,6 +155,7 @@ Body (raw, JSON):
   "quantity": 10,
   "transaction_type": "IN"
 }
+
 Allowed transaction_type values:
 
 "IN" — to add stock
