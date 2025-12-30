@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app import schemas, crud
+from decimal import Decimal
 from app.database import SessionLocal
+from app import models, schemas
 
 router = APIRouter(prefix="/products", tags=["Products"])
+
 
 def get_db():
     db = SessionLocal()
@@ -12,26 +14,36 @@ def get_db():
     finally:
         db.close()
 
+
 @router.post("/", response_model=schemas.Product)
-def add_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    return crud.create_product(db, product)
+def create_product(payload: schemas.ProductCreate, db: Session = Depends(get_db)):
 
-@router.get("/", response_model=list[schemas.Product])
-def list_products(db: Session = Depends(get_db)):
-    return crud.get_products(db)
+    if db.query(models.Product).filter_by(sku=payload.sku).first():
+        raise HTTPException(status_code=400, detail="SKU already exists")
 
-@router.get("/{product_id}", response_model=schemas.Product)
-def get_product(product_id: int, db: Session = Depends(get_db)):
-    db_product = crud.get_product(db, product_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return db_product
+    warehouse = db.query(models.Warehouse).filter_by(id=payload.warehouse_id).first()
+    if not warehouse:
+        raise HTTPException(status_code=404, detail="Warehouse not found")
 
-@router.put("/{product_id}", response_model=schemas.Product)
-def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
-    return crud.update_product(db, product_id, product)
+    try:
+        product = models.Product(
+            name=payload.name,
+            sku=payload.sku,
+            price=Decimal(payload.price)
+        )
+        db.add(product)
+        db.flush()
 
-@router.delete("/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db)):
-    crud.delete_product(db, product_id)
-    return {"message": "Product deleted"}
+        inventory = models.Inventory(
+            product_id=product.id,
+            warehouse_id=payload.warehouse_id,
+            quantity=payload.initial_quantity
+        )
+        db.add(inventory)
+
+        db.commit()
+        return product
+
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to create product")
