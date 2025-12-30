@@ -1,30 +1,63 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from decimal import Decimal
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+import enum
 
 
-class ProductCreate(BaseModel):
+class TransactionType(str, enum.Enum):
+    IN = "IN"
+    OUT = "OUT"
+
+
+class ProductBase(BaseModel):
     name: str
-    sku: str
-    price: Decimal
-    warehouse_id: int
-    initial_quantity: int = Field(ge=0)
+    description: Optional[str] = None
+    price: float
+    available_quantity: int
 
 
-class Product(BaseModel):
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductUpdate(ProductBase):
+    pass
+
+
+class Product(ProductBase):
     id: int
-    name: str
-    sku: str
-    price: Decimal
 
     class Config:
         orm_mode = True
 
 
-class SupplierOut(BaseModel):
+class StockTransactionBase(BaseModel):
+    product_id: int
+    quantity: int
+    transaction_type: TransactionType
+
+
+class StockTransactionCreate(StockTransactionBase):
+    pass
+
+
+class StockTransaction(StockTransactionBase):
+    id: int
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+from typing import List
+
+
+class SupplierInfo(BaseModel):
     id: int
     name: str
     contact_email: str
+
+    class Config:
+        orm_mode = True
 
 
 class LowStockAlert(BaseModel):
@@ -36,7 +69,7 @@ class LowStockAlert(BaseModel):
     current_stock: int
     threshold: int
     days_until_stockout: int
-    supplier: Optional[SupplierOut]
+    supplier: SupplierInfo
 
 
 class LowStockResponse(BaseModel):
